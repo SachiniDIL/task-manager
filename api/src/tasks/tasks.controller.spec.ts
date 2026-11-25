@@ -6,6 +6,7 @@ import { Task } from './entities/task.entity';
 describe('TasksController', () => {
   let controller: TasksController;
   const createTaskMock = jest.fn();
+  const getAllTasksMock = jest.fn();
 
   const mockTask: Task = {
     id: 1,
@@ -25,6 +26,7 @@ describe('TasksController', () => {
           provide: TasksService,
           useValue: {
             createTask: createTaskMock,
+            getAllTasks: getAllTasksMock,
           },
         },
       ],
@@ -49,5 +51,16 @@ describe('TasksController', () => {
 
     expect(createTaskMock).toHaveBeenCalledWith(createTaskDto);
     expect(result).toEqual(mockTask);
+  });
+
+  it('should return all tasks from the service', async () => {
+    const mockTasks = [mockTask];
+
+    getAllTasksMock.mockResolvedValue(mockTasks);
+
+    const result = await controller.getAll();
+
+    expect(getAllTasksMock).toHaveBeenCalled();
+    expect(result).toEqual(mockTasks);
   });
 });

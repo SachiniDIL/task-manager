@@ -12,8 +12,12 @@ export class TasksService {
   ) {}
 
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-  const task = this.taskRepository.create(createTaskDto);
+    const task = this.taskRepository.create(createTaskDto);
 
-  return this.taskRepository.save(task);
-}
+    return this.taskRepository.save(task);
+  }
+
+  async getAllTasks(): Promise<Task[]> {
+    return this.taskRepository.find();
+  }
 }

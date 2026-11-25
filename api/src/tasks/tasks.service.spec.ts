@@ -7,6 +7,7 @@ describe('TasksService', () => {
   let service: TasksService;
   const createTaskMock = jest.fn();
   const saveTaskMock = jest.fn();
+  const findTasksMock = jest.fn();
 
   const mockTask = {
     id: 1,
@@ -27,6 +28,7 @@ describe('TasksService', () => {
           useValue: {
             create: createTaskMock,
             save: saveTaskMock,
+            find: findTasksMock,
           },
         },
       ],
@@ -53,5 +55,16 @@ describe('TasksService', () => {
     expect(createTaskMock).toHaveBeenCalledWith(createTaskDto);
     expect(saveTaskMock).toHaveBeenCalledWith(mockTask);
     expect(result).toEqual(mockTask);
+  });
+
+  it('should return all tasks', async () => {
+    const mockTasks = [mockTask];
+
+    findTasksMock.mockResolvedValue(mockTasks);
+
+    const result = await service.getAllTasks();
+
+    expect(findTasksMock).toHaveBeenCalled();
+    expect(result).toEqual(mockTasks);
   });
 });
