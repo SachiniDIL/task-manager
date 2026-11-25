@@ -86,4 +86,33 @@ describe('TasksService', () => {
     await expect(service.getTaskById(999)).rejects.toThrow(NotFoundException);
     expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 999 });
   });
+
+  it('should update an existing task', async () => {
+    const updateTaskDto = {
+      completed: true,
+    };
+
+    findTaskByIdMock.mockResolvedValue({ ...mockTask });
+    saveTaskMock.mockImplementation((task) => Promise.resolve(task));
+
+    const result = await service.updateTask(1, updateTaskDto);
+
+    expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 1 });
+    expect(saveTaskMock).toHaveBeenCalledWith({
+      ...mockTask,
+      completed: true,
+    });
+    expect(result.completed).toBe(true);
+  });
+
+  it('should throw NotFoundException when updating a non-existing task', async () => {
+    findTaskByIdMock.mockResolvedValue(null);
+
+    await expect(
+      service.updateTask(999, { completed: true }),
+    ).rejects.toThrow(NotFoundException);
+
+    expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 999 });
+    expect(saveTaskMock).not.toHaveBeenCalled();
+  });
 });

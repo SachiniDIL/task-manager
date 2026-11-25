@@ -8,6 +8,7 @@ describe('TasksController', () => {
   const createTaskMock = jest.fn();
   const getAllTasksMock = jest.fn();
   const getTaskByIdMock = jest.fn();
+  const updateTaskMock = jest.fn();
 
   const mockTask: Task = {
     id: 1,
@@ -29,6 +30,7 @@ describe('TasksController', () => {
             createTask: createTaskMock,
             getAllTasks: getAllTasksMock,
             getTaskById: getTaskByIdMock,
+            updateTask: updateTaskMock,
           },
         },
       ],
@@ -73,5 +75,20 @@ describe('TasksController', () => {
 
     expect(getTaskByIdMock).toHaveBeenCalledWith(1);
     expect(result).toEqual(mockTask);
+  });
+
+  it('should update a task using the service', async () => {
+    const updateTaskDto = {
+      completed: true,
+    };
+
+    updateTaskMock.mockResolvedValue(
+      Object.assign({}, mockTask, { completed: true }),
+    );
+
+    const result = await controller.update(1, updateTaskDto);
+
+    expect(updateTaskMock).toHaveBeenCalledWith(1, updateTaskDto);
+    expect(result.completed).toBe(true);
   });
 });
