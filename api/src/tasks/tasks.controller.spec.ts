@@ -7,6 +7,7 @@ describe('TasksController', () => {
   let controller: TasksController;
   const createTaskMock = jest.fn();
   const getAllTasksMock = jest.fn();
+  const getTaskByIdMock = jest.fn();
 
   const mockTask: Task = {
     id: 1,
@@ -27,6 +28,7 @@ describe('TasksController', () => {
           useValue: {
             createTask: createTaskMock,
             getAllTasks: getAllTasksMock,
+            getTaskById: getTaskByIdMock,
           },
         },
       ],
@@ -62,5 +64,14 @@ describe('TasksController', () => {
 
     expect(getAllTasksMock).toHaveBeenCalled();
     expect(result).toEqual(mockTasks);
+  });
+
+  it('should return a task by ID from the service', async () => {
+    getTaskByIdMock.mockResolvedValue(mockTask);
+
+    const result = await controller.getById(1);
+
+    expect(getTaskByIdMock).toHaveBeenCalledWith(1);
+    expect(result).toEqual(mockTask);
   });
 });

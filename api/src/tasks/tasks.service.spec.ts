@@ -2,12 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { TasksService } from './tasks.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('TasksService', () => {
   let service: TasksService;
   const createTaskMock = jest.fn();
   const saveTaskMock = jest.fn();
   const findTasksMock = jest.fn();
+  const findTaskByIdMock = jest.fn();
 
   const mockTask = {
     id: 1,
@@ -29,6 +31,7 @@ describe('TasksService', () => {
             create: createTaskMock,
             save: saveTaskMock,
             find: findTasksMock,
+            findOneBy: findTaskByIdMock,
           },
         },
       ],
@@ -66,5 +69,21 @@ describe('TasksService', () => {
 
     expect(findTasksMock).toHaveBeenCalled();
     expect(result).toEqual(mockTasks);
+  });
+
+  it('should return a task by ID', async () => {
+    findTaskByIdMock.mockResolvedValue(mockTask);
+
+    const result = await service.getTaskById(1);
+
+    expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 1 });
+    expect(result).toEqual(mockTask);
+  });
+
+  it('should throw NotFoundException if task not found by ID', async () => {
+    findTaskByIdMock.mockResolvedValue(null);
+
+    await expect(service.getTaskById(999)).rejects.toThrow(NotFoundException);
+    expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 999 });
   });
 });
