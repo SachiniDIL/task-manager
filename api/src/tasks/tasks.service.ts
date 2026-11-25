@@ -39,4 +39,10 @@ export class TasksService {
 
     return this.taskRepository.save(task);
   }
+
+  async deleteTask(id: number): Promise<void> {
+    const task = await this.getTaskById(id);
+
+    await this.taskRepository.remove(task);
+  }
 }

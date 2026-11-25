@@ -10,6 +10,7 @@ describe('TasksService', () => {
   const saveTaskMock = jest.fn();
   const findTasksMock = jest.fn();
   const findTaskByIdMock = jest.fn();
+  const removeTaskMock = jest.fn();
 
   const mockTask = {
     id: 1,
@@ -32,6 +33,7 @@ describe('TasksService', () => {
             save: saveTaskMock,
             find: findTasksMock,
             findOneBy: findTaskByIdMock,
+            remove: removeTaskMock,
           },
         },
       ],
@@ -114,5 +116,24 @@ describe('TasksService', () => {
 
     expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 999 });
     expect(saveTaskMock).not.toHaveBeenCalled();
+  });
+
+  it('should delete an existing task', async () => {
+    findTaskByIdMock.mockResolvedValue(mockTask);
+    removeTaskMock.mockResolvedValue(mockTask);
+
+    await service.deleteTask(1);
+
+    expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 1 });
+    expect(removeTaskMock).toHaveBeenCalledWith(mockTask);
+  });
+
+  it('should throw NotFoundException when deleting a non-existing task', async () => {
+    findTaskByIdMock.mockResolvedValue(null);
+
+    await expect(service.deleteTask(999)).rejects.toThrow(NotFoundException);
+
+    expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 999 });
+    expect(removeTaskMock).not.toHaveBeenCalled();
   });
 });

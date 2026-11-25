@@ -9,6 +9,7 @@ describe('TasksController', () => {
   const getAllTasksMock = jest.fn();
   const getTaskByIdMock = jest.fn();
   const updateTaskMock = jest.fn();
+  const deleteTaskMock = jest.fn();
 
   const mockTask: Task = {
     id: 1,
@@ -31,6 +32,7 @@ describe('TasksController', () => {
             getAllTasks: getAllTasksMock,
             getTaskById: getTaskByIdMock,
             updateTask: updateTaskMock,
+            deleteTask: deleteTaskMock,
           },
         },
       ],
@@ -90,5 +92,13 @@ describe('TasksController', () => {
 
     expect(updateTaskMock).toHaveBeenCalledWith(1, updateTaskDto);
     expect(result.completed).toBe(true);
+  });
+
+  it('should delete a task using the service', async () => {
+    deleteTaskMock.mockResolvedValue(undefined);
+
+    await controller.delete(1);
+
+    expect(deleteTaskMock).toHaveBeenCalledWith(1);
   });
 });
