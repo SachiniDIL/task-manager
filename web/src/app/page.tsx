@@ -22,6 +22,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     getTasks()
@@ -39,6 +40,18 @@ export default function Home() {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed).length;
   const pendingTasks = totalTasks - completedTasks;
+
+  const filteredTasks = tasks.filter((task) => {
+    if (statusFilter === 'pending') {
+      return !task.completed;
+    }
+
+    if (statusFilter === 'completed') {
+      return task.completed;
+    }
+
+    return true;
+  });
 
   return (
     <main className="min-h-screen bg-muted/30">
@@ -79,11 +92,33 @@ export default function Home() {
 
         {/* Task list */}
         <section className="rounded-xl border bg-card">
-          <div className="border-b p-5">
-            <h2 className="text-lg font-semibold">Your Tasks</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              View and manage all your tasks in one place.
-            </p>
+          <div className="flex flex-col gap-3 border-b p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Your Tasks</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                View and manage all your tasks in one place.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="status-filter"
+                className="text-sm font-medium"
+              >
+                Filter:
+              </label>
+
+              <select
+                id="status-filter"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="all">All Tasks</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
           </div>
 
           <div className="p-5">
@@ -118,6 +153,10 @@ export default function Home() {
               <div className="py-8 text-center text-muted-foreground">
                 No tasks yet
               </div>
+            ) : filteredTasks.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                No {statusFilter} tasks found.
+              </div>
             ) : (
               <Table>
                 <TableHeader>
@@ -131,17 +170,20 @@ export default function Home() {
                 </TableHeader>
 
                 <TableBody>
-                  {tasks.map((task) => (
+                  {filteredTasks.map((task) => (
                     <TableRow key={task.id}>
                       <TableCell className="font-medium">
                         {task.title}
                       </TableCell>
+
                       <TableCell>
                         {task.description || '—'}
                       </TableCell>
+
                       <TableCell>
                         {task.dueDate || '—'}
                       </TableCell>
+
                       <TableCell>
                         <Badge
                           variant={
@@ -151,18 +193,21 @@ export default function Home() {
                           {task.completed ? 'Completed' : 'Pending'}
                         </Badge>
                       </TableCell>
+
                       <TableCell>
                         <TaskDialog
                           key={`${task.id}-${task.updatedAt}`}
                           task={task}
-                          onTaskCreated={() => 
+                          onTaskCreated={() =>
                             setRefreshKey((current) => current + 1)
                           }
                         />
 
                         <TaskDeleteDialog
                           taskId={task.id}
-                          onTaskDeleted={() => setRefreshKey((current) => current + 1)}
+                          onTaskDeleted={() =>
+                            setRefreshKey((current) => current + 1)
+                          }
                         />
                       </TableCell>
                     </TableRow>
