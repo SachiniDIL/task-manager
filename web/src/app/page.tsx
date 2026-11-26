@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/table';
 import TaskDialog from '@/components/task-dialog';
 import TaskDeleteDialog from '@/components/task-delete-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -86,12 +88,31 @@ export default function Home() {
 
           <div className="p-5">
             {isLoading ? (
-              <div className="py-8 text-center text-muted-foreground">
-                Loading tasks...
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-4"
+                  >
+                    <Skeleton className="h-10 flex-1" />
+                    <Skeleton className="h-10 w-32" />
+                    <Skeleton className="h-10 w-24" />
+                  </div>
+                ))}
               </div>
             ) : error ? (
-              <div className="py-8 text-center text-destructive">
-                {error}
+              <div className="flex flex-col items-center gap-3 py-8">
+                <p className="text-destructive">{error}</p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setError(null);
+                    setIsLoading(true);
+                    setRefreshKey((current) => current + 1);
+                  }}
+                >
+                  Try Again
+                </Button>
               </div>
             ) : tasks.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
