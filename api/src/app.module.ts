@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { mkdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TasksModule } from './tasks/tasks.module';
@@ -10,11 +12,27 @@ import { TasksModule } from './tasks/tasks.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: process.env.DATABASE_PATH || 'data/task-manager.sqlite',
-      autoLoadEntities: true,
-      synchronize: false,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const databasePath = resolve(
+          process.cwd(),
+          configService.get<string>(
+            'DATABASE_PATH',
+            'data/task-manager.sqlite',
+          ),
+        );
+
+        mkdirSync(dirname(databasePath), { recursive: true });
+
+        return {
+          type: 'better-sqlite3' as const,
+          database: databasePath,
+          autoLoadEntities: true,
+          synchronize: false,
+        };
+      },
     }),
     TasksModule,
   ],
