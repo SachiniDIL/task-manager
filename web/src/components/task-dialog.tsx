@@ -45,7 +45,7 @@ export default function TaskDialog({
         title: title.trim(),
         description: description.trim() || undefined,
         completed,
-        dueDate: dueDate || undefined,
+        dueDate: dueDate || null,
         };
 
         if (task) {
@@ -150,6 +150,16 @@ export default function TaskDialog({
                 value={dueDate}
                 onChange={(event) => setDueDate(event.target.value)}
             />
+            {dueDate && (
+            <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setDueDate('')}
+            >
+                Clear due date
+            </Button>
+            )}
             </div>
 
             {error && (

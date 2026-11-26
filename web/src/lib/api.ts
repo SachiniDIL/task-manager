@@ -42,7 +42,7 @@ export interface CreateTaskInput {
   title: string;
   description?: string;
   completed?: boolean;
-  dueDate?: string;
+  dueDate?: string | null;
 }
 
 export async function createTask(
