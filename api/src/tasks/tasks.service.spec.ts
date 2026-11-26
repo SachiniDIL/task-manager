@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { TasksService } from './tasks.service';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('TasksService', () => {
   let service: TasksService;
@@ -135,5 +135,11 @@ describe('TasksService', () => {
 
     expect(findTaskByIdMock).toHaveBeenCalledWith({ id: 999 });
     expect(removeTaskMock).not.toHaveBeenCalled();
+  });
+
+  it('should throw BadRequestException when update data is empty', async () => {
+    await expect(service.updateTask(1, {})).rejects.toThrow(
+      BadRequestException,
+    );
   });
 });
