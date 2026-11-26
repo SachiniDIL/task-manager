@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: task-manager-api
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      PORT: ${API_PORT}
+      DATABASE_PATH: ${DATABASE_PATH}
+      FRONTEND_URL: ${FRONTEND_URL}
+    volumes:
+      - task-manager-data:/app/data
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: task-manager-web
+    ports:
+      - "${WEB_PORT}:3000"
+    depends_on:
+      - api
+
+volumes:
+  task-manager-data:
