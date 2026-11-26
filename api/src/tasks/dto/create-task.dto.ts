@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsDateString,
   IsOptional,
   IsString,
   MaxLength,
@@ -20,4 +21,8 @@ export class CreateTaskDto {
   @IsOptional()
   @IsBoolean()
   completed?: boolean;
+
+  @IsOptional()
+  @IsDateString({ strict: true })
+  dueDate?: string;
 }

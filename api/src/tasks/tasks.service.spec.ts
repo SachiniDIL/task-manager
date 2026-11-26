@@ -17,6 +17,7 @@ describe('TasksService', () => {
     title: 'Learn NestJS',
     description: 'Practice unit testing',
     completed: false,
+    dueDate: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -62,6 +63,27 @@ describe('TasksService', () => {
     expect(result).toEqual(mockTask);
   });
 
+  it('should create a task with a due date', async () => {
+    const createTaskDto = {
+      title: 'Complete assignment',
+      dueDate: '2026-12-01',
+    };
+
+    const taskWithDueDate = {
+      ...mockTask,
+      ...createTaskDto,
+    };
+
+    createTaskMock.mockReturnValue(taskWithDueDate);
+    saveTaskMock.mockResolvedValue(taskWithDueDate);
+
+    const result = await service.createTask(createTaskDto);
+
+    expect(createTaskMock).toHaveBeenCalledWith(createTaskDto);
+    expect(saveTaskMock).toHaveBeenCalledWith(taskWithDueDate);
+    expect(result.dueDate).toBe('2026-12-01');
+  });
+
   it('should return all tasks', async () => {
     const mockTasks = [mockTask];
 
@@ -105,6 +127,23 @@ describe('TasksService', () => {
       completed: true,
     });
     expect(result.completed).toBe(true);
+  });
+
+  it('should update the due date of an existing task', async () => {
+    const newDueDate = '2026-12-15';
+
+    findTaskByIdMock.mockResolvedValue({ ...mockTask });
+    saveTaskMock.mockImplementation((task) => Promise.resolve(task));
+
+    const result = await service.updateTask(1, {
+      dueDate: newDueDate,
+    });
+
+    expect(saveTaskMock).toHaveBeenCalledWith({
+      ...mockTask,
+      dueDate: newDueDate,
+    });
+    expect(result.dueDate).toBe(newDueDate);
   });
 
   it('should throw NotFoundException when updating a non-existing task', async () => {
