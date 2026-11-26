@@ -128,3 +128,16 @@
     @apply font-sans;
   }
 }
+
+@layer base {
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
