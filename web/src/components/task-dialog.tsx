@@ -63,11 +63,13 @@ export default function TaskDialog({
         toast.success(task ? 'Task updated successfully!' : 'Task created successfully!');
 
         onTaskCreated();
-    } catch {
+    } catch (error: unknown) {
         setError(
-            task
-            ? 'Failed to update task. Please try again.'
-            : 'Failed to create task. Please try again.'
+            error instanceof Error
+            ? error.message
+            : task
+                ? 'Failed to update task. Please try again.'
+                : 'Failed to create task. Please try again.',
         );
     } finally {
         setIsSubmitting(false);

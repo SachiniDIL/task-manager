@@ -35,8 +35,12 @@ export default function TaskDeleteDialog({
 
       toast.success('Task deleted successfully!');
       onTaskDeleted();
-    } catch {
-      toast.error('Failed to delete task. Please try again.');
+    } catch (error: unknown) {
+        toast.error(
+            error instanceof Error
+            ? error.message
+            : 'Failed to delete task. Please try again.',
+        );
     } finally {
       setIsDeleting(false);
     }
