@@ -23,6 +23,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dateSort, setDateSort] = useState('earliest');
 
   useEffect(() => {
     getTasks()
@@ -51,6 +52,16 @@ export default function Home() {
     }
 
     return true;
+  });
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+
+    return dateSort === 'earliest'
+      ? a.dueDate.localeCompare(b.dueDate)
+      : b.dueDate.localeCompare(a.dueDate);
   });
 
   return (
@@ -100,24 +111,45 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="status-filter"
-                className="text-sm font-medium"
-              >
-                Filter:
-              </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="status-filter"
+                  className="text-sm font-medium"
+                >
+                  Filter:
+                </label>
 
-              <select
-                id="status-filter"
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="all">All Tasks</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-              </select>
+                <select
+                  id="status-filter"
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                  className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="all">All Tasks</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="date-sort"
+                  className="text-sm font-medium"
+                >
+                  Sort:
+                </label>
+
+                <select
+                  id="date-sort"
+                  value={dateSort}
+                  onChange={(event) => setDateSort(event.target.value)}
+                  className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="earliest">Earliest First</option>
+                  <option value="latest">Latest First</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -153,7 +185,7 @@ export default function Home() {
               <div className="py-8 text-center text-muted-foreground">
                 No tasks yet
               </div>
-            ) : filteredTasks.length === 0 ? (
+            ) : sortedTasks.length === 0 ? (
               <div className="py-8 text-center text-muted-foreground">
                 No {statusFilter} tasks found.
               </div>
@@ -170,7 +202,7 @@ export default function Home() {
                 </TableHeader>
 
                 <TableBody>
-                  {filteredTasks.map((task) => (
+                  {sortedTasks.map((task) => (
                     <TableRow key={task.id}>
                       <TableCell className="font-medium">
                         {task.title}
