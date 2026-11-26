@@ -118,6 +118,9 @@ export default function TaskDialog({
                 placeholder="Enter task description"
                 maxLength={2000}
             />
+            <p className="text-right text-xs text-muted-foreground">
+            {description.length}/2000 characters
+            </p>
             </div>
 
             <div className="space-y-2">
